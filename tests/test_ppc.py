@@ -168,9 +168,5 @@ class TestGhidra(unittest.TestCase):
 
         self.assertEqual(byte_result, b'\x7f\xe3\xfb\x78\x83\xe1\x00\x1c\x83\xc1\x00\x18\x83\xa1\x00\x14\x83\x81\x00\x10\x80\x01\x00\x24\x7c\x08\x03\xa6\x38\x21\x00\x20\x4e\x80\x00\x20')
 
-    def test_big_giant_function(self):
-        byte_result = b''
-
-
 if __name__ == '__main__':
     unittest.main()

@@ -9,6 +9,7 @@ from structs.TMD import TMD
 from structs.Ticket import Ticket
 from structs.WiiPartitionEntry import WiiPartitionEntry
 from helpers.Enums import WiiPartType
+from file_helper.dol import DOL
 
 from WiiIsoReader import WiiIsoReader
 from builder.WiiPartitionInterface import WiiPartitionInterface
@@ -16,7 +17,9 @@ from file_system_table.FST import FST
 
 
 class CopyBuilder(WiiPartitionInterface):
-    def __init__(self, reader: WiiIsoReader, partition: WiiPartitionEntry, fst_modifier: Optional[Callable[[FST], None]] = None) -> None:
+    def __init__(self, reader: WiiIsoReader, partition: WiiPartitionEntry,
+                 fst_modifier: Optional[Callable[[FST], None]] = None,
+                 dol_modifier: Optional[Callable[[DOL], None]] = None) -> None:
         copy_partition = copy.copy(partition)
         self.partition_info = reader.open_partition(copy_partition)
         self.partition_type = partition.part_type
@@ -31,6 +34,9 @@ class CopyBuilder(WiiPartitionInterface):
 
         if fst_modifier is not None:
             fst_modifier(self.fst)
+
+        if dol_modifier is not None:
+            dol_modifier(self.dol)
 
     def get_partition_type(self) -> WiiPartType:
         return WiiPartType(self.partition_type)
@@ -54,7 +60,7 @@ class CopyBuilder(WiiPartitionInterface):
         return self.apploader
 
     def get_dol(self) -> bytes:
-        return self.dol
+        return self.dol.to_bytes()
 
     def get_fst(self) -> FST:
         return self.fst

@@ -10,7 +10,7 @@ from structs.Certificate import Certificate
 from structs.DiscHeader import DiscHeader
 from structs.TMD import TMD
 from structs.WiiPartitionHeader import WiiPartitionHeader
-from structs.DOLHeader import DOLHeader
+from file_helper.dol import DOL
 
 
 class WiiPartitionInfo:
@@ -58,21 +58,22 @@ class WiiPartitionInfo:
 
         return self.crypto.read_at(apploader_offset, total_size)
 
-    def read_dol(self) -> bytes:
+    def read_dol(self) -> DOL:
         dol_offset = self.internal_header.DOL_offset
         header_data = self.crypto.read_at(dol_offset, 0x100)
-        dol_header = DOLHeader.read(BytesIO(header_data))
+        dol_header = DOL.read(BytesIO(header_data))
 
         dol_size = 0x100
         for i in range(7):
-            end = dol_header.text_offset[i] + dol_header.text_length[i]
+            end = dol_header.header.text_offset[i] + dol_header.header.text_length[i]
             dol_size = max(dol_size, end)
 
         for i in range(11):
-            end = dol_header.data_offset[i] + dol_header.data_length[i]
+            end = dol_header.header.data_offset[i] + dol_header.header.data_length[i]
             dol_size = max(dol_size, end)
 
-        return self.crypto.read_at(dol_offset, dol_size)
+        dol_data = self.crypto.read_at(dol_offset, dol_size)
+        return DOL.read(BytesIO(dol_data))
 
     def read_bi2(self) -> bytes:
         bi2_offset = 0x440  # maybe constant though
