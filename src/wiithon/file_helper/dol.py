@@ -1,5 +1,5 @@
 from io import BytesIO
-from typing import BinaryIO
+from typing import BinaryIO, Any
 import struct
 
 from wiithon.structs.DOLHeader import DOLHeader
@@ -210,16 +210,25 @@ class DOL:
         self.write_at(lis_vaddr,     ppc.lis(3, hi))
         self.write_at(lis_vaddr + 4, ppc.ori(3, 3, lo))
 
-    def inject_above_arena(self, sections: list[bytes], manual_arena: int = None, padding: int = 0x100) -> list[int]:
+    def inject_above_arena(
+            self,
+            sections: list[bytes],
+            manual_arena: int = None,
+            padding: int = 0x100,
+            reserved_size: int | None = None
+    ) -> tuple[int | Any, list[Any]]:
         if manual_arena is None:
             site = self.find_arena_lo_setter()
         else:
             site = manual_arena
-        base = self.read_arena_lo(site) + padding
+
+        original_arena = self.read_arena_lo(site)
+        original_arena = (original_arena + 0x1F) & ~0x1F
+        base = original_arena + padding
         addrs = []
         cursor = (base + 31) & ~31
         for data in sections:
-            if self.has_free_data_section():
+            if self.has_free_text_section():
                 self.add_text_section(cursor, data)
             elif self.has_free_data_section():
                 self.add_data_section(cursor, data)
@@ -228,8 +237,19 @@ class DOL:
 
             addrs.append(cursor)
             cursor = (cursor + len(data) + 31) & ~31
-        self.patch_arena_lo(site, cursor)
-        return addrs
+
+        if reserved_size is not None:
+            new_arena = (base + reserved_size + 0x1F) & ~0x1F
+            if cursor > new_arena:
+                raise ValueError(
+                    f"Code exceeds reserved_size: used {cursor - base:#x}, reserved {reserved_size:#x}"
+                )
+        else:
+            new_arena = (cursor + 0x1F) & ~0x1F
+
+        difference = new_arena - original_arena
+        self.patch_arena_lo(site, new_arena)
+        return difference, addrs
 
     def find_code_caves(self, min_size: int = 0x40) -> list[tuple[str, int, int]]:
         results = []

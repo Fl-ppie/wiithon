@@ -29,7 +29,8 @@ def apply_patches(dol: DOL) -> None:
     print(f"  bl {PATCH_ADDR_BL_TARGET:#010x} @ {PATCH_ADDR_BL_FROM:#010x}")
 
     code = ppc.nop() * 5
-    addr = dol.inject_above_arena([code])
+    diff, addr = dol.inject_above_arena([code])
+    print(f"diff in the ram (aligned) @ {diff:#010x}")
     print(f"payload @ {addr[0]:#010x}")
 
 
