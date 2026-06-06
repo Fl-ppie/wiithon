@@ -2,7 +2,7 @@ from typing import BinaryIO
 from io import BytesIO
 import struct
 
-from wiithon.helpers.Utils import read_u8, read_u32, read_string, read_u64_shifted
+from wiithon.helpers.Utils import read_u8, read_u32, read_string, read_u32_shifted
 
 class DiscHeader:
     """
@@ -82,10 +82,10 @@ Disc Header:
         obj.debug_mon_offset = read_u32(stream)
         obj.debug_load_address = read_u32(stream)
         stream.read(0x18)
-        obj.DOL_offset = read_u64_shifted(stream)
-        obj.FST_offset = read_u64_shifted(stream)
-        obj.FST_size = read_u64_shifted(stream)
-        obj.FST_max_size = read_u64_shifted(stream)
+        obj.DOL_offset = read_u32_shifted(stream)
+        obj.FST_offset = read_u32_shifted(stream)
+        obj.FST_size = read_u32_shifted(stream)
+        obj.FST_max_size = read_u32_shifted(stream)
         obj.FST_memory_address =  read_u32(stream)
         obj.user_position =  read_u32(stream)
         obj.user_size =  read_u32(stream)

@@ -1,6 +1,6 @@
 from typing import Callable, Optional
 
-from six import BytesIO
+from io import BytesIO
 
 from wiithon.file_helper.bnr import BNR
 from wiithon.file_system_table.FST import FST
@@ -46,7 +46,11 @@ class WiiIsoPatcher:
 
     def remove_file(self, path: str) -> None:
         key = path.strip("/")
-        self.files_to_remove.append(key)
+        if key in self.files_to_add:
+            self.files_to_add.pop(key)
+            self.file_replacements.pop(key)
+        else:
+            self.files_to_remove.append(key)
 
     def replace_file(self, path: str, data: bytes) -> None:
         self.file_replacements[path.strip("/")] = data

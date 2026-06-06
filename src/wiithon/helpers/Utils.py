@@ -3,15 +3,15 @@ from typing import BinaryIO
 from Crypto.Cipher import AES
 import hashlib
 
-from wiithon.helpers.Constants import *
+from wiithon.helpers.Constants import (
+    COMMON_KEYS, SHA1_SIZE,
+
+    BLOCK_HEADER_SIZE, BLOCK_PER_GROUP, BLOCK_SIZE,
+    SUBGROUP_BY_GROUP, SUBBLOCK_SIZE, SUBBLOCK_BY_BLOCK,
+    BLOCK_BY_SUBGROUP, SUBGROUP_SIZE
+)
+
 from wiithon.helpers.Enums import KeyType
-
-
-###########################
-####### BYTES UTILS #######
-###########################
-
-# Wanted to create a function for n bytes at 0x00 but useless ?
 
 ###########################
 #### READ/WRITE UTILS #####
@@ -49,7 +49,7 @@ def read_u8(stream: BinaryIO) -> int:
     """
     return struct.unpack('>B', stream.read(1))[0]
 
-def read_u64_shifted(stream: BinaryIO) -> int:
+def read_u32_shifted(stream: BinaryIO) -> int:
     """
     Read an u32 and left-shift it by 2 bits (x4)
     :param stream: Binary IO stream
@@ -70,7 +70,6 @@ def read_shiftjis(stream: BinaryIO, offset: int) -> str:
     """
     Read a shift JS from a stream at a current offset
 
-    TODO: doesn't work without the try-except, maybe need to know why ?
     :param stream: The Binary IO stream
     :param offset: The current offset
     :return: shift JS string
@@ -84,10 +83,7 @@ def read_shiftjis(stream: BinaryIO, offset: int) -> str:
 
         chars += byte
 
-    try:
-        return chars.decode('shift_jis')
-    except UnicodeDecodeError:
-        return chars.decode('shift_jis', errors='replace')
+    return chars.decode('shift_jis', errors='replace')
 
 ###########################
 ### CRYPTOGRAPHIC UTILS ###
@@ -111,18 +107,18 @@ def decrypt_title_key(encrypted_key: bytes, common_key_index: int, title_id: byt
     cipher = AES.new(COMMON_KEYS[common_key_index], AES.MODE_CBC, iv)
     return cipher.decrypt(encrypted_key)
 
-def encrypt_title_key(encrypted_key: bytes, common_key_index: int, title_id: bytes) -> bytes:
+def encrypt_title_key(decrypted_key: bytes, common_key_index: int, title_id: bytes) -> bytes:
     """
     Encrypt the title key using the common key and title ID as IV
 
-    :param encrypted_key: Encrypted title key
+    :param decrypted_key: Decrypted title key
     :param common_key_index: Common key index
     :param title_id: Title ID
-    :return: Encrypted title key
+    :return: Decrypted title key
     """
     iv: bytes = title_id + b'\x00' * 8 # 16 bytes and the first 8 are the title id
     cipher = AES.new(COMMON_KEYS[common_key_index], AES.MODE_CBC, iv)
-    return cipher.encrypt(encrypted_key)
+    return cipher.encrypt(decrypted_key)
 
 def get_length_from_key_type(key_type: KeyType) -> (int, int, int):
     """
@@ -175,7 +171,7 @@ def decrypt_group(group_data: bytes, title_key: bytes) -> bytes:
     :return: Decrypted group
     """
     result = bytearray()
-    for i in range(BLOCk_PER_GROUP):
+    for i in range(BLOCK_PER_GROUP):
         current_block_start = i * BLOCK_SIZE
         current_block = group_data[current_block_start: current_block_start + BLOCK_SIZE]
         result.extend(decrypt_block(current_block, title_key))
@@ -187,8 +183,7 @@ def encrypt_group(group_data: bytes | bytearray, title_key: bytes, h3_ref: bytea
     """
     Hash and encrypt a full 2MB group
     Reference: https://wiibrew.org/wiki/Wii_disc#Encrypted
-    TODO: Better to returns tuple of (bytes, bytearray) with encrypted group / h3 or keeping h3 ref ?
-    TODO: Maybe some magic numbers into constants but i'm afraid that's a lot of constants then. Maybe consider adding variable for slicing ?
+
     :param group_data: 2MB bytes/bytearray to be hashed and encrypted
     :param title_key: 16-byte decrypted title key
     :param h3_ref: Optional bytearray of length 20 where the H3 hash will be stored

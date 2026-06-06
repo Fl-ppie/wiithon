@@ -1,4 +1,5 @@
 import sys
+from random import Random
 
 from wiithon.WiiIsoPatcher import WiiIsoPatcher
 
@@ -29,9 +30,11 @@ def apply_patches(dol: DOL) -> None:
     print(f"  bl {PATCH_ADDR_BL_TARGET:#010x} @ {PATCH_ADDR_BL_FROM:#010x}")
 
     code = ppc.nop() * 5
-    diff, addr = dol.inject_above_arena([code])
-    print(f"diff in the ram (aligned) @ {diff:#010x}")
-    print(f"payload @ {addr[0]:#010x}")
+    code2 = ppc.nop() * 16
+    diff, addr = dol.inject_above_arena([code, code2])
+    print(f"diff in the ram @ {diff:#010x}")
+    print(f"payload 0 @ {addr[0]:#010x}")
+    print(f"payload 1 @ {addr[1]:#010x}")
 
 
 # A .dol file

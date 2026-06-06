@@ -3,7 +3,7 @@ from Crypto.Cipher import AES
 
 from wiithon.helpers.Constants import (
     GROUP_SIZE, GROUP_DATA_SIZE, BLOCK_SIZE,
-    BLOCK_HEADER_SIZE, BLOCK_DATA_SIZE, BLOCk_PER_GROUP
+    BLOCK_HEADER_SIZE, BLOCK_DATA_SIZE, BLOCK_PER_GROUP
 )
 from wiithon.helpers.Utils import encrypt_group
 
@@ -79,7 +79,7 @@ class CryptPartWriter:
         self.current_group = group
 
         # Decrypt - because of all the issues that i had, i recreated the function but may TODO: using the decrypt_group from Utils
-        for i in range(BLOCk_PER_GROUP):
+        for i in range(BLOCK_PER_GROUP):
             start = i * BLOCK_SIZE
 
             # Save the encrypted IV for the data section

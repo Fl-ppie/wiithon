@@ -1,7 +1,7 @@
 from typing import BinaryIO
 import struct
 
-from wiithon.helpers.Utils import read_u32, read_u64_shifted
+from wiithon.helpers.Utils import read_u32, read_u32_shifted
 from wiithon.structs.Ticket import Ticket
 
 
@@ -31,12 +31,12 @@ class WiiPartitionHeader:
 
         obj.ticket                   = Ticket.read(stream)
         obj.tmd_size                 = read_u32(stream)
-        obj.tmd_offset               = read_u64_shifted(stream)
+        obj.tmd_offset               = read_u32_shifted(stream)
         obj.certificate_chain_size   = read_u32(stream)
-        obj.certificate_chain_offset = read_u64_shifted(stream)
-        obj.global_hash_table_offset = read_u64_shifted(stream)
-        obj.data_offset              = read_u64_shifted(stream)
-        obj.data_size                = read_u64_shifted(stream)
+        obj.certificate_chain_offset = read_u32_shifted(stream)
+        obj.global_hash_table_offset = read_u32_shifted(stream)
+        obj.data_offset              = read_u32_shifted(stream)
+        obj.data_size                = read_u32_shifted(stream)
 
         return obj
 

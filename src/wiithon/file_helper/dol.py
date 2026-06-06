@@ -1,3 +1,4 @@
+import warnings
 from io import BytesIO
 from typing import BinaryIO, Any
 import struct
@@ -171,7 +172,7 @@ class DOL:
 
         raise RuntimeError(f"No free data section slot (all {DATA_SECTIONS} used)")
 
-    def find_arena_lo_setter(self) -> int | None:
+    def find_arena_lo_setter(self) -> int:
         """
         Finds the 'lis r3' address in the arenaLo setup sequence.
         Pattern (found empirically across multiple Wii games):
@@ -179,7 +180,7 @@ class DOL:
           addi r3, r3, Y   (38 63 ?? ??)
           addi r0, r3, 31  (38 03 ?? ??)
           rlwinm r3, r0, ? (54 03 ?? ??)
-        Returns the virtual address of the lis, or None if not found.
+        Returns the virtual address of the lis.
         """
         checks = [(0, b'\x3c\x60'), (4, b'\x38\x63'), (8, b'\x38\x03'), (12, b'\x54\x03')]
 
@@ -214,9 +215,9 @@ class DOL:
             self,
             sections: list[bytes],
             manual_arena: int = None,
-            padding: int = 0x100,
+            padding_before: int = 0x100,
             reserved_size: int | None = None
-    ) -> tuple[int | Any, list[Any]]:
+    ) -> tuple[int, list[int]]:
         if manual_arena is None:
             site = self.find_arena_lo_setter()
         else:
@@ -224,7 +225,7 @@ class DOL:
 
         original_arena = self.read_arena_lo(site)
         original_arena = (original_arena + 0x1F) & ~0x1F
-        base = original_arena + padding
+        base = original_arena + padding_before
         addrs = []
         cursor = (base + 31) & ~31
         for data in sections:
@@ -301,7 +302,7 @@ class DOL:
 
         bss_end = self.header.bss_start + self.header.bss_size
         if self.header.bss_start < virtual_addr + size and virtual_addr < bss_end:
-            print(f"Warning: {virtual_addr:08X} is in  BSS")
+            warnings.warn(f"Warning: {virtual_addr:08X} is in  BSS")
         return True
 
 def _align4(size: int) -> int:

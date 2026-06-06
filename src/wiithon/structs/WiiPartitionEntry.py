@@ -1,7 +1,7 @@
 import struct
 from typing import BinaryIO
 
-from wiithon.helpers.Utils import read_u64_shifted, read_u32
+from wiithon.helpers.Utils import read_u32_shifted, read_u32
 
 
 class WiiPartitionEntry:
@@ -17,7 +17,7 @@ class WiiPartitionEntry:
     @classmethod
     def read(cls, stream: BinaryIO) -> "WiiPartitionEntry":
         obj = cls(0, 0)
-        obj.offset = read_u64_shifted(stream)
+        obj.offset = read_u32_shifted(stream)
         obj.part_type = read_u32(stream)
         return obj
 
@@ -54,7 +54,7 @@ def read_parts(stream: BinaryIO) -> list[WiiPartitionEntry]:
     groups: list[tuple[int, int]] = []
     for _ in range(4):
         count = read_u32(stream)
-        offset = read_u64_shifted(stream)
+        offset = read_u32_shifted(stream)
         groups.append((count, offset))
 
     entries: list[WiiPartitionEntry] = []
