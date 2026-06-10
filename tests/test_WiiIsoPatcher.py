@@ -113,6 +113,17 @@ class TestRemoveFile(unittest.TestCase):
         p.remove_file("/ObjectData/Old.arc")
         self.assertIn("ObjectData/Old.arc", p.files_to_remove)
 
+    def test_add_then_remove(self):
+        p = _make_patcher()
+        p.add_file("/ObjectData/NewAdd.arc", b'data')
+        self.assertIn("ObjectData/NewAdd.arc", p.files_to_add)
+        self.assertIn("ObjectData/NewAdd.arc", p.file_replacements)
+
+        p.remove_file("ObjectData/NewAdd.arc")
+        self.assertNotIn("ObjectData/NewAdd.arc", p.files_to_add)
+        self.assertNotIn("ObjectData/NewAdd.arc", p.file_replacements)
+        self.assertNotIn("ObjectData/NewAdd.arc", p.files_to_remove)
+
     def test_multiple_calls_accumulate(self):
         p = _make_patcher()
         p.remove_file("a.bin")

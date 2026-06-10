@@ -92,8 +92,8 @@ class Ticket:
         obj.permitted_title_mask    = read_u32(stream)
         obj.permit_mark             = read_u32(stream)
         obj.title_export_allowed    = read_u8(stream)
-        stream.read(0x30)
         obj.common_key_index        = read_u8(stream)
+        stream.read(0x30)
         obj.content_access_permission = stream.read(0x40)
         obj.unknown2 = read_u16(stream)
         obj.time_limit = [TicketTimeLimit.read(stream) for _ in range(0x08)]

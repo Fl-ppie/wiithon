@@ -45,25 +45,18 @@ class TestGhidra(unittest.TestCase):
         self.assertEqual(u32(bl(0x80009ea8, 0x80007758)), 0x48002751)  # Location: 0x 80007758 - Instruction: 0x48002751 - Code:      bl         FUN_80009ea8
         self.assertEqual(u32(bl(0x80409b40, 0x8000849c)), 0x484016a5)  # Location: 0x 8000849c - Instruction: 0x484016a5 - Code:      bl         __dl__FPv  (0x80409b40)
 
+    # TODO: It seems PowerPC doesn't compile into these mnemonics, so i don't have any tests to do
     def test_bc(self):
-        self.assertEqual(u32(nop()), 0x60000000)
-        self.assertEqual(u32(nop()), 0x60000000)
-        self.assertEqual(u32(nop()), 0x60000000)
+        pass
 
     def test_bcl(self):
-        self.assertEqual(u32(nop()), 0x60000000)
-        self.assertEqual(u32(nop()), 0x60000000)
-        self.assertEqual(u32(nop()), 0x60000000)
+        pass
 
     def test_cmp(self):
-        self.assertEqual(u32(nop()), 0x60000000)
-        self.assertEqual(u32(nop()), 0x60000000)
-        self.assertEqual(u32(nop()), 0x60000000)
+        pass
 
     def test_cmpi(self):
-        self.assertEqual(u32(nop()), 0x60000000)
-        self.assertEqual(u32(nop()), 0x60000000)
-        self.assertEqual(u32(nop()), 0x60000000)
+        pass
 
     def test_cntlzw(self):
         self.assertEqual(u32(cntlzw(0, 28)), 0x7f800034)  # Location: 0x8000aa50  - Instruction: 0x7f800034 - Code: cntlzw     r0, r28

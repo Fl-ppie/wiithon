@@ -94,7 +94,8 @@ class WiiIsoPatcher:
         if len(b) != 0x06:
             raise RuntimeError(f"Title ID needs to be 6 bytes length, got: {len(b)} with {b}")
 
-        self.reader.disc_header.game_id = new_id.encode("ascii")
+        self.reader.disc_header.game_id = b
+        self.data_partition.header.ticket.title_id = b'\x00\x01\x00\x00' + b[:4]
 
     def build(self, output_path: str, progress_cb=None) -> None:
         builder = WiiDiscBuilder(self.reader.disc_header, self.reader.region)

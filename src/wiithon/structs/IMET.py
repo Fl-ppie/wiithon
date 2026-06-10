@@ -51,12 +51,9 @@ class IMET:
         return ""
 
     def set_title(self, title: str, language: str = "English") -> None:
-        if language in IMET_LANGUAGES:
-            err_str = ", ".join(IMET_LANGUAGES)
-            raise ValueError(f"language must be in one of these: {err_str}")
-
-        idx = IMET_LANGUAGES.index(language)
-        self.titles[idx] = title
+        if language not in IMET_LANGUAGES:
+            raise ValueError(f"language must be one of: {', '.join(IMET_LANGUAGES)}")
+        self.titles[IMET_LANGUAGES.index(language)] = title
 
     def write(self, stream: BinaryIO) -> None:
         stream.write(b'\x00' * IMET_PADDING_SIZE)

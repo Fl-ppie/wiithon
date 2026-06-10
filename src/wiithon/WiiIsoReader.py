@@ -4,7 +4,7 @@ from typing import BinaryIO, List, Optional
 from wiithon.WiiPartitionInfo import WiiPartitionInfo
 from wiithon.crypto.CryptPartReader import CryptPartReader
 from wiithon.file_system_table.FST import FST
-from wiithon.helpers.Utils import read_u32
+from wiithon.helpers.Utils import read_u32, json_repr
 from wiithon.structs.Certificate import Certificate
 from wiithon.structs.DiscHeader import DiscHeader
 from wiithon.structs.TMD import TMD
@@ -12,8 +12,10 @@ from wiithon.structs.WiiPartitionEntry import WiiPartitionEntry, read_parts
 from wiithon.structs.WiiPartitionHeader import WiiPartitionHeader
 
 
+@json_repr
 class WiiIsoReader:
     def __init__(self, path: str) -> None:
+        self.path = path
         self.file: BinaryIO = open(path, "rb")
         self.disc_header: DiscHeader = DiscHeader.read(self.file)
         self.partitions: List[WiiPartitionEntry] = read_parts(self.file)
@@ -25,7 +27,7 @@ class WiiIsoReader:
     def get_data_partition(self) -> Optional[WiiPartitionEntry]:
         return next((p for p in self.partitions if p.part_type == 0), None)
 
-    def update_data_partition(self) -> Optional[WiiPartitionEntry]:
+    def get_update_partition(self) -> Optional[WiiPartitionEntry]:
         return next((p for p in self.partitions if p.part_type == 1), None)
 
     def get_partitions(self) -> List[WiiPartitionEntry]:
