@@ -66,3 +66,9 @@ IMET_TITLE_COUNT = 0x0A
 IMET_TITLE_MAX_BYTES = 0x54
 IMET_LANGUAGES = ["Japanese", "English", "German", "French", "Spanish",
                   "Italian", "Dutch", "Simplified Chinese", "Traditional Chinese", "Korean"]
+
+            ############
+            #### U8 ####
+            ############
+
+U8_MAGIC_WORD: bytes = b'\x55\xAA\x38\x2D'

@@ -257,6 +257,13 @@ def encrypt_group(group_data: bytes | bytearray, title_key: bytes, h3_ref: bytea
 
     return bytes(buffer)
 
+
+###########################
+########## UTILS ##########
+###########################
+def align(value: int, boundary: int) -> int:
+    return (value + boundary - 1) & ~(boundary - 1)
+
 ###########################
 ####### PRINT UTILS #######
 ###########################
