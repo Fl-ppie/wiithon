@@ -22,7 +22,7 @@ class BCSVFileError(Exception):
 def calculate_field_hash(field_name: str) -> int:
     """
     Field names are stored internally in RAM for GC/Wii games as hashes, as they are faster lookup tables. So, we will
-    calculate the hast and the resulting hash is a 32-bit value.
+    calculate the hast and the resulting hash is a 32-bit value. Breaks on first null byte (if any)
 
     Args:
         field_name (str): name of the field to calculate a hash for.
@@ -30,7 +30,7 @@ def calculate_field_hash(field_name: str) -> int:
     field_hash: int = 0
 
     for ch in field_name.encode(STRING_FORMAT):
-        if ch == b"\x00":
+        if ch == 0:
             break
         ch = ch - 256 if ch >= 128 else ch
         field_hash = (field_hash * 0x1F) + ch
