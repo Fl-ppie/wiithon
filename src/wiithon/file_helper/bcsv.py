@@ -1,6 +1,6 @@
 from enum import IntEnum
 from io import BytesIO
-from typing import NamedTuple, get_args
+from typing import NamedTuple, Union
 from abc import ABC, abstractmethod
 
 import wiithon.helpers.Utils as fh
@@ -27,7 +27,7 @@ class BCSVKey(ABC):
         pass
 
     @staticmethod
-    def create(key: int | str | 'BCSVField') -> 'BCSVKey':
+    def create(key: Union[str, int, 'BCSVField']) -> 'BCSVKey':
         """
         Creates a BCSVKey from one of the support input types.
         
